@@ -73,6 +73,18 @@ POINT = Point(
             "keeps ExecutionSession for the scipy COBYLA loop (es.estimate_cost) plus a final "
             "es.sample; .dataframe access on the kept session",
         ),
+        (
+            "the_classiq_tutorial/execution_tutorial_part2",
+            "tutorial deliberately demonstrates ExecutionSession.submit_sample/submit_observe "
+            "+ ExecutionJob.from_id retrieval — the async submit_* API has no free-function "
+            "equivalent",
+        ),
+        (
+            "telecom/resiliency_planning/resiliency_planning_AMD",
+            "does not use the classiq execution API — synthesizes then runs QASM on a Qiskit "
+            "Aer (AMD GPU) simulator; parsed_counts belongs to a custom ClassiqSampleResult "
+            "shim that mimics classiq, not the SDK's sample()",
+        ),
         # The 3 block-encoding notebooks share one statevector + get_projected_state_vector
         # helper; the flat API rejects statevector backends. Proper fix = a coordinated
         # calculate_state_vector refactor of the helper + all 3 together (deferred).
@@ -100,6 +112,19 @@ POINT = Point(
             "RBAnalysis (hardware.backend_name) + ExecutionDetails.counts; free sample() takes "
             "only a backend-name string and returns a DataFrame, and execute_async/batch_* "
             "have no free-function equivalent",
+        ),
+        (
+            "physical_systems/quantum_chaos/quantum_sawtooth_map",
+            "simulator run already migrated; the IonQ hardware path (behind RUN_ON_HARDWARE, "
+            "default False) passes an IonqBackendPreferences object and uses submit_batch_sample "
+            "-> ExecutionJob.from_id -> get_batch_sample_result (async submit/retrieve-later), "
+            "which the flat/free API cannot express",
+        ),
+        (
+            "basic_tutorials/quantumwalk_complex_network/quantumwalk_complex_network",
+            "live execution already uses free sample(); only a commented-out optional IBM "
+            "hardware example keeps ExecutionSession + ExecutionPreferences with a credentialed "
+            "IBMBackendPreferences, which free sample() (backend = str only) cannot carry",
         ),
         # Legacy construct_combinatorial_optimization_model + VQE flow: execute(qprog)
         # .result_value() runs the embedded classical VQE and returns a VQESolverResult

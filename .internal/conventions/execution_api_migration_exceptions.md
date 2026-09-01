@@ -28,21 +28,26 @@ DataFrame the helper cannot consume. The proper fix is a **coordinated
 `calculate_state_vector` refactor** of the shared helper plus all three
 notebooks together — a follow-up, not part of this PR.
 
-## 2. Multi-backend comparison via `BackendPreferences` objects (2) — no flat equivalent
+## 2. `BackendPreferences` objects / async job submission (3) — no flat equivalent
 
 - `applications/benchmarking/quantum_volume/quantum_volume.ipynb`
 - `applications/benchmarking/randomized_benchmarking/randomized_benchmarking.ipynb`
+- `applications/physical_systems/quantum_chaos/quantum_sawtooth_map.ipynb` (its
+  simulator run is migrated; only the real-hardware path is kept)
+- `tutorials/basic_tutorials/quantumwalk_complex_network/quantumwalk_complex_network.ipynb`
+  (live run migrated; only a commented-out credentialed IBM-hardware example kept)
 
-These pass full **`BackendPreferences` objects** (simulator / IBM / Azure, with
-credentials) to compare backends. Free `sample()` only accepts a backend **name
-string** (+ optional `ProviderConfig`); the only current surface that accepts an
-arbitrary `BackendPreferences` object is `ExecutionPreferences(backend_preferences=…)`.
-`randomized_benchmarking` additionally consumes those objects downstream
-(`RBAnalysis` reads `hardware.backend_name`), needs `ExecutionDetails.counts`
-(free `sample()` returns a DataFrame with no `.counts`), and runs a **concurrent
-`execute_async` batch** for which there is no free-function equivalent
-(`batch_*` are removed stubs). Flattening either would drop backends/credentials
-or serialize the batch — a behavior/performance change — so both are kept.
+These pass full **`BackendPreferences` objects** (simulator / IBM / Azure / IonQ,
+often with credentials) to select or compare backends. Free `sample()` only
+accepts a backend **name string** (+ optional `ProviderConfig`); the only current
+surface that accepts an arbitrary `BackendPreferences` object is
+`ExecutionPreferences(backend_preferences=…)`. They also use APIs with **no
+free-function equivalent**: `randomized_benchmarking` consumes the objects in
+`RBAnalysis` (`hardware.backend_name`), needs `ExecutionDetails.counts`, and runs
+a concurrent `execute_async` batch; `quantum_sawtooth_map`'s hardware path (behind
+`RUN_ON_HARDWARE`, default `False`) uses `submit_batch_sample` → `ExecutionJob.from_id`
+→ `get_batch_sample_result` (submit-now, retrieve-later). Flattening would drop
+backends/credentials or destroy the async workflow — a behavior change — so kept.
 
 ## 3. Legacy combinatorial-optimization VQE flow (7) — needs a CombinatorialProblem rewrite
 
@@ -65,6 +70,16 @@ returns a DataFrame and never runs the VQE, so there is **no mechanical
 separate follow-up. Note: PR #1643 (the comprehensive R&D migration reference)
 also left all seven of these untouched.
 
+## 4. Not the classiq execution API at all (1)
+
+- `applications/telecom/resiliency_planning/resiliency_planning_AMD.ipynb`
+
+Synthesizes with classiq, then extracts QASM and runs on a **Qiskit Aer (AMD GPU)
+simulator**. Its `parsed_counts` hits belong to a custom `ClassiqSampleResult`
+shim that reshapes Qiskit output to _look_ like classiq — it is not the SDK's
+execution surface, so there is nothing to migrate. (Dead `classiq.execution`
+imports were removed.)
+
 ---
 
 ## Not exceptions — kept sessions that ARE the new interface
@@ -75,6 +90,9 @@ across a manual optimizer/VQE loop), not old-API leftovers, and are also listed
 as exceptions so the report does not flag them: `qaoa`, `gm_qaoa`,
 `vehicle_routing_problem`, `adapt_vqe`, `adapt_qaoa`, `vqls_with_lcu`,
 `robust_posture_optimization`, `network_traffic_optimization`.
+`execution_tutorial_part2` also keeps a session, but as a **deliberate feature
+demo** of the async `submit_sample`/`submit_observe` + `ExecutionJob.from_id`
+API (no free-function equivalent).
 (`vqls_with_lcu` also keeps a final
 `simulator_statevector` measurement whose optional `calculate_state_vector`
 refactor is deferred, as with the group-1 notebooks.)
