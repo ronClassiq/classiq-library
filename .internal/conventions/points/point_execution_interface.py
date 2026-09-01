@@ -50,6 +50,18 @@ POINT = Point(
             "keeps ExecutionSession for the per-operator gradient loop (~56 executions of "
             "qprog_grads); standalone minimize calls use the free variational_minimize",
         ),
+        (
+            "quantum_linear_solvers/vqls/vqls_with_lcu",
+            "keeps ExecutionSession for the scipy COBYLA optimizer loop (es.sample) and for "
+            "the final simulator_statevector measurement (df.amplitude), which the flat/free "
+            "API rejects",
+        ),
+        (
+            "optimization/adapt_qaoa/adapt_qaoa",
+            "partially migrated; keeps ExecutionSession for the vanilla-QAOA COBYLA loop "
+            "(es.estimate_cost) + final es.sample, the ADAPT COBYLA loop, and the per-mixer "
+            "gradient loop (es.observe); res.parsed_counts on the kept-session ExecutionDetails",
+        ),
         # The 3 block-encoding notebooks share one statevector + get_projected_state_vector
         # helper; the flat API rejects statevector backends. Proper fix = a coordinated
         # calculate_state_vector refactor of the helper + all 3 together (deferred).
@@ -70,6 +82,46 @@ POINT = Point(
             "passes an arbitrary BackendPreferences object (simulator/IBM/Azure with "
             "credentials) to compare backends; free sample() only accepts a backend name "
             "string, so ExecutionPreferences(...) + session is the only surface that fits",
+        ),
+        (
+            "benchmarking/randomized_benchmarking/randomized_benchmarking",
+            "batched async multi-backend execution: batch_preferences objects consumed by "
+            "RBAnalysis (hardware.backend_name) + ExecutionDetails.counts; free sample() takes "
+            "only a backend-name string and returns a DataFrame, and execute_async/batch_* "
+            "have no free-function equivalent",
+        ),
+        # Legacy construct_combinatorial_optimization_model + VQE flow: execute(qprog)
+        # .result_value() runs the embedded classical VQE and returns a VQESolverResult
+        # (consumed by get_optimization_solution_from_pyo), not a sample DataFrame — no
+        # mechanical execute()->sample() swap. Migrating means a structural rewrite to the
+        # CombinatorialProblem API — a deferred follow-up (PR #1643 left these untouched too).
+        (
+            "cybersecurity/link_monitoring/link_monitoring",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "optimization/qaoa_in_qaoa/qaoa_in_qaoa",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "technology_demonstrations/qaoa/qaoa_demonstration",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "optimization/rectangles_packing/rectangles_packing_grid",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "logistics/task_scheduling_problem/task_scheduling_problem",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "telecom/radio_access_network/radio_access_network_positioning_antennas",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
+        ),
+        (
+            "low_autocorrelation_binary_sequences_problem/evidence_scaling_labs",
+            "legacy construct_combinatorial_optimization_model + VQESolverResult flow",
         ),
     ),
 )
