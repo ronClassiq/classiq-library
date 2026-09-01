@@ -50,12 +50,20 @@ POINT = Point(
             "keeps ExecutionSession for the per-operator gradient loop (~56 executions of "
             "qprog_grads); standalone minimize calls use the free variational_minimize",
         ),
+        # The 3 block-encoding notebooks share one statevector + get_projected_state_vector
+        # helper; the flat API rejects statevector backends. Proper fix = a coordinated
+        # calculate_state_vector refactor of the helper + all 3 together (deferred).
         (
             "hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qsvt",
-            "statevector post-selection: es.sample() feeds a shared ExecutionDetails-based "
-            "helper (get_projected_state_vector) and the flat API rejects statevector "
-            "backends. Proper fix is a coordinated calculate_state_vector refactor across "
-            "the helper + all 3 block-encoding siblings (gqsp, qubitization) — deferred",
+            "statevector post-selection via a shared ExecutionDetails-based helper",
+        ),
+        (
+            "hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_gqsp",
+            "statevector post-selection via a shared ExecutionDetails-based helper",
+        ),
+        (
+            "hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qubitization",
+            "statevector post-selection via a shared ExecutionDetails-based helper",
         ),
     ),
 )
