@@ -62,6 +62,17 @@ POINT = Point(
             "(es.estimate_cost) + final es.sample, the ADAPT COBYLA loop, and the per-mixer "
             "gradient loop (es.observe); res.parsed_counts on the kept-session ExecutionDetails",
         ),
+        (
+            "optimization/robust_posture_optimization/robust_posture_optimization",
+            "keeps ExecutionSession (es_X/es_Y/es_Z) for the scipy COBYLA optimizer loop + "
+            "estimate_arm_pos; .counts on the kept-session ExecutionDetails (raw-bitstring "
+            "histogram) stays",
+        ),
+        (
+            "telecom/network_traffic_optimization/network_traffic_optimization",
+            "keeps ExecutionSession for the scipy COBYLA loop (es.estimate_cost) plus a final "
+            "es.sample; .dataframe access on the kept session",
+        ),
         # The 3 block-encoding notebooks share one statevector + get_projected_state_vector
         # helper; the flat API rejects statevector backends. Proper fix = a coordinated
         # calculate_state_vector refactor of the helper + all 3 together (deferred).

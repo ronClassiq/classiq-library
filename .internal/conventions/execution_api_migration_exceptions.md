@@ -73,6 +73,8 @@ For completeness: a few migrated notebooks still contain an `ExecutionSession`
 **by design** — these are the correct new-interface pattern (a session reused
 across a manual optimizer/VQE loop), not old-API leftovers, and are also listed
 as exceptions so the report does not flag them: `qaoa`, `gm_qaoa`,
-`vehicle_routing_problem`, `adapt_vqe`, `vqls_with_lcu`. (`vqls_with_lcu` also
-keeps a final `simulator_statevector` measurement whose optional
-`calculate_state_vector` refactor is deferred, as with the group-1 notebooks.)
+`vehicle_routing_problem`, `adapt_vqe`, `adapt_qaoa`, `vqls_with_lcu`,
+`robust_posture_optimization`, `network_traffic_optimization`.
+(`vqls_with_lcu` also keeps a final
+`simulator_statevector` measurement whose optional `calculate_state_vector`
+refactor is deferred, as with the group-1 notebooks.)
