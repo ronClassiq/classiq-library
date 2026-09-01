@@ -18,6 +18,9 @@ report treats them as conforming. They are grouped below with the reason.
 - `algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qsvt.ipynb`
 - `algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_gqsp.ipynb`
 - `algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qubitization.ipynb`
+- `tutorials/workshops/algo_design_QCE_tutorial/algo_design_QCE_tutorial_part_I.ipynb`
+  (mostly migrated to free `sample()`; only Exercise/Solution 6A keep a
+  `simulator_statevector` run via a `ClassiqBackendPreferences` object)
 
 They run on a **statevector backend** and feed `es.sample()`'s `ExecutionDetails`
 into a **shared helper** (`get_projected_state_vector`, in
@@ -89,7 +92,9 @@ For completeness: a few migrated notebooks still contain an `ExecutionSession`
 across a manual optimizer/VQE loop), not old-API leftovers, and are also listed
 as exceptions so the report does not flag them: `qaoa`, `gm_qaoa`,
 `vehicle_routing_problem`, `adapt_vqe`, `adapt_qaoa`, `vqls_with_lcu`,
-`robust_posture_optimization`, `network_traffic_optimization`.
+`robust_posture_optimization`, `network_traffic_optimization`,
+`combinatorial_qmod_workshop_for_maxcut`, `combi_workshop_Inequality_constriants_PO`,
+`combi_workshop_equality_constriants_PO`, `algo_design_QCE_tutorial_part_II`.
 `execution_tutorial_part2` also keeps a session, but as a **deliberate feature
 demo** of the async `submit_sample`/`submit_observe` + `ExecutionJob.from_id`
 API (no free-function equivalent).

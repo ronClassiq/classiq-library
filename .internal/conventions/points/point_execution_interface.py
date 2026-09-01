@@ -74,6 +74,33 @@ POINT = Point(
             "es.sample; .dataframe access on the kept session",
         ),
         (
+            "finance_workshops/combi_workshop_Inequality_constriants_PO",
+            "keeps ExecutionSession for the scipy COBYLA optimizer loop (es.estimate_cost) "
+            "plus a final es.sample; portfolio output is a QStruct, so parsed_counts stays",
+        ),
+        (
+            "finance_workshops/combi_workshop_equality_constriants_PO",
+            "keeps ExecutionSession for the scipy COBYLA optimizer loop (es.estimate_cost) "
+            "plus a final es.sample; portfolio output is a QStruct, so parsed_counts stays",
+        ),
+        (
+            "algo_design_QCE_tutorial_part_I.ipynb",  # .ipynb so it does not also match part_II
+            "mostly migrated to free sample(); Exercise/Solution 6A keep a "
+            "simulator_statevector run via a ClassiqBackendPreferences object, which the "
+            "flat/free API cannot express",
+        ),
+        (
+            "algo_design_QCE_tutorial_part_II.ipynb",
+            "keeps two ExecutionSessions (variational_minimize + a follow-up sample of the "
+            "optimized params = qprog executed twice); print_statistics needs parsed_counts on "
+            "the QStruct output; the single-execution sample_anzatz was migrated to free sample()",
+        ),
+        (
+            "combinatorial_workshop/combinatorial_qmod_workshop_for_maxcut",
+            "twin of QAOA/qaoa: keeps ExecutionSession for the scipy COBYLA optimizer loop "
+            "(es.estimate_cost) plus a final es.sample; parsed_counts kept to match the sibling",
+        ),
+        (
             "the_classiq_tutorial/execution_tutorial_part2",
             "tutorial deliberately demonstrates ExecutionSession.submit_sample/submit_observe "
             "+ ExecutionJob.from_id retrieval — the async submit_* API has no free-function "
