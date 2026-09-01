@@ -50,5 +50,12 @@ POINT = Point(
             "keeps ExecutionSession for the per-operator gradient loop (~56 executions of "
             "qprog_grads); standalone minimize calls use the free variational_minimize",
         ),
+        (
+            "hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qsvt",
+            "statevector post-selection: es.sample() feeds a shared ExecutionDetails-based "
+            "helper (get_projected_state_vector) and the flat API rejects statevector "
+            "backends. Proper fix is a coordinated calculate_state_vector refactor across "
+            "the helper + all 3 block-encoding siblings (gqsp, qubitization) — deferred",
+        ),
     ),
 )
