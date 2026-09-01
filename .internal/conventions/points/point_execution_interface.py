@@ -65,5 +65,11 @@ POINT = Point(
             "hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qubitization",
             "statevector post-selection via a shared ExecutionDetails-based helper",
         ),
+        (
+            "benchmarking/quantum_volume/quantum_volume",
+            "passes an arbitrary BackendPreferences object (simulator/IBM/Azure with "
+            "credentials) to compare backends; free sample() only accepts a backend name "
+            "string, so ExecutionPreferences(...) + session is the only surface that fits",
+        ),
     ),
 )
