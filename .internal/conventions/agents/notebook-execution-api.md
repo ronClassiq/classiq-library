@@ -102,6 +102,20 @@ If keeping a session leaves the notebook flagged by `report.py`, **that is
 expected** — report it so a human adds a detector exception. Do not remove the
 session to satisfy the checker.
 
+**Notebooks span cells.** When a kept session must live across several cells (the
+common case — the optimizer is defined in one cell and run in another), do **not**
+force one giant `with` block. Instantiate plainly and close at the end; `with` is
+only sugar for this, and the same session is reused (verified):
+
+```python
+es = ExecutionSession(qprog, num_shots=NUM_SHOTS)   # one cell
+# ... later cells: define objective(params) using es, run the optimizer ...
+es.close()                                          # final cell
+```
+
+A single `es.minimize(...)` / `variational_minimize(...)` call is **not** a manual
+loop — it self-iterates internally. See rule 5b: use the free function, no session.
+
 ### 3. Removing execution preferences (three shapes)
 
 Pass `num_shots` (and backend, seed) **directly** to `sample()` / the flat
@@ -128,6 +142,24 @@ qmod = create_model(main)
 qmod = update_execution_preferences(qmod, num_shots=NUM_SHOTS)
 qprog = synthesize(qmod)
 ```
+
+**`CombinatorialProblem` is a live high-level API — do NOT treat it as old.**
+`combi.optimize(execution_preferences=..., maxiter=..., quantile=...)`,
+`combi.sample(...)`, `combi.sample_uniform()`, `combi.cost_trace()` are all
+current (verified in classiq 1.27.0); `execution_preferences` is an optional arg
+(default `None`). Two cases for the `ExecutionPreferences` passed to `optimize`:
+
+- **Redundant with the default** — e.g. only
+  `ExecutionPreferences(backend_preferences=ClassiqBackendPreferences(backend_name="simulator"))`
+  (simulator is already the default, no custom `num_shots`). **Delete it** and
+  call `combi.optimize(maxiter=..., quantile=...)` bare — behavior-identical, and
+  it matches already-migrated sibling notebooks. (This clears the detector.)
+- **Carries non-default settings** (custom `num_shots`, a real backend). **Keep
+  it** — it is a live API argument — and flag the notebook for a detector
+  exception. Do not mangle it.
+
+Do NOT rename `combi.sample(...)` result variables — that is the high-level API,
+not the free `sample()`/`observe()` surface, and is out of scope for this pass.
 
 ### 4. Variable naming (by return type)
 
@@ -160,6 +192,13 @@ for s in result.parsed_counts:          for _, row in df.iterrows():
 # OLD result.counts["0"]      → NEW  df[df["output_var"] == 0]["counts"].sum()
 ```
 
+**Struct (`QStruct`) outputs are an exception — keep `parsed_counts`.** When a
+measured output is a struct, `.dataframe` **flattens** it into separate columns
+(`v.a`, `v.b`) with no single `v` column, so `parsed_counts` code that does
+attribute access (`sampled.state["v"].a`, or passes `v` to helpers expecting
+`v.a`/`v.b`) cannot be mechanically converted. **Leave `parsed_counts` in place**
+and flag the notebook for a detector exception — do **not** build a struct shim.
+
 ### 5b. estimate / minimize → observe / variational_minimize
 
 ```python
@@ -171,11 +210,24 @@ value = observe(qprog, hamiltonian)                 # no .value
 value = observe(qprog, hamiltonian, parameters={"params": p})
 ```
 
-On a **kept** session (rule 2), rename in place — signatures are unchanged, and
-the return object is the same (so keep `.value` on `es.observe`):
+On a **kept** session (rule 2 — there are OTHER `es` calls in a manual loop),
+rename in place; signatures and return objects are unchanged (keep `.value` on
+`es.observe`):
 
 - `es.estimate(...).value` → `es.observe(...).value`
 - `es.minimize(...)` → `es.variational_minimize(...)`
+
+**But if the session exists ONLY for that one `minimize` call** (no other `es`
+calls), it is a single self-iterating optimization, not a manual loop — **drop
+the session and use the free function**:
+
+```python
+# OLD
+with ExecutionSession(qprog) as es:
+    result = es.minimize(cost, initial_params=p0, max_iteration=200)
+# NEW — variational_minimize runs the whole optimization itself
+result = variational_minimize(qprog, cost, initial_params=p0, max_iteration=200)
+```
 
 SciPy's `optimize.minimize(...)` is **unrelated** — never touch it.
 

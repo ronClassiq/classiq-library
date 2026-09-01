@@ -26,4 +26,29 @@ POINT = Point(
     detect=detect,
     fix=None,  # migration reshapes cells; handled per-family (script or agent), not one regex
     subsignals=_exec_signals.SIGNALS,
+    # Reviewed exceptions: notebooks that correctly use the new interface but keep
+    # an ExecutionSession by design (a deliberate multi-call loop driven by a
+    # classical optimizer) and/or must keep parsed_counts (a QStruct output that
+    # `.dataframe` would flatten). These are conforming, not offenders.
+    exceptions=(
+        (
+            "search_and_optimization/QAOA/qaoa",
+            "keeps ExecutionSession for two scipy optimizer loops (es.estimate_cost); "
+            "knapsack output is a QStruct, so parsed_counts stays",
+        ),
+        (
+            "search_and_optimization/grover_mixer_qaoa/gm_qaoa",
+            "keeps ExecutionSession for both COBYLA optimizer loops (es.estimate_cost)",
+        ),
+        (
+            "logistics/vehicle_routing_problem/vehicle_routing_problem",
+            "keeps ExecutionSession for the scipy COBYLA loop (es.estimate_cost) plus a "
+            "final es.sample; .dataframe access on the kept session",
+        ),
+        (
+            "quantum_state_preparation/adapt_vqe/adapt_vqe",
+            "keeps ExecutionSession for the per-operator gradient loop (~56 executions of "
+            "qprog_grads); standalone minimize calls use the free variational_minimize",
+        ),
+    ),
 )
